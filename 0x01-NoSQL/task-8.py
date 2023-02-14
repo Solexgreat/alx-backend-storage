@@ -1,2 +1,1 @@
-ksn 
-= ks m
+ksn = 8
