@@ -1,2 +1,2 @@
 ksn 
-= ks 
+= ks mazm
