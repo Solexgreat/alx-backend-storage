@@ -8,6 +8,7 @@ from pymongo import MongoClient
 def list_all(mongo_collection):
     """Function recieves collection, loop and 
         and append the document to a list"""
+
     doc_list = []
 
     if len(mongo_collection) == 0:
