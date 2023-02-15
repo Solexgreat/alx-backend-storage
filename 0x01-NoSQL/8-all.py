@@ -1,18 +1,19 @@
-#!/urs/bin/env python3
+#!/usr/bin/env python3
 """REturn the list of all document"""
 
 
-from pymongo import MongoClient
-
+import pymongo 
 
 def list_all(mongo_collection):
     """Function recieves collection, loop and 
         and append the document to a list"""
+
+    documents = mongo_collection.find()    
     doc_list = []
 
-    if len(mongo_collection) == 0:
+    if documents.count == 0:
         return(doc_list)
 
-    for document in mongo_collection:
+    for document in documents:
         doc_list.append(document)
-        print(doc_list)
+    print(doc_list)
