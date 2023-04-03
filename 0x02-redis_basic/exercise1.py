@@ -1,6 +1,17 @@
 import redis
 import uuid
 from typing import Union
+from functools import wraps
+
+def count_calls(methods: callable=None) -> callable:
+    """
+    """
+    @wraps(methods)
+    def wrapper(self, data: Union[str, int, float, bytes]) -> Union[str, int, float, bytes, None]:
+        key = methods.__qualname__
+        self._redis.incr(key)
+        return methods(self, data)
+    return wrapper
 
 
 class cache:
@@ -12,6 +23,7 @@ class cache:
         self._redis = redis.Redis()
         self._redis.flushdb()
    
+    @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """store method takes a single argument, data,
            which can be a string, bytes, int or float,
