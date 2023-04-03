@@ -34,30 +34,19 @@ class cache:
 
         return None
     
-    def get_int(self, key: str, fn: callable=None) -> Union[int, None]:
+    def get_int(self, key: str) -> Union[int, None]:
         """Return key in 'int'
         """
         value = self._redis.get(key)
-        if value is not value:
-            if fn is not None:
-                if isinstance(fn, int):
-                    value = int(value)
-            
-            else:
-                return value
-
-        return None
+        try:
+            value = int(value.decode('utf-8'))
+        except Exception:
+            return None
+        
+        return value
     
-    def get_str(self, key: str, fn: callable=None) -> Union[str, None]:
+    def get_str(self, key: str) -> Union[str, None]:
         """Return key in 'str'
         """
-        value = self._redis.get(key)
-        if value is not value:
-            if fn is not None:
-                if isinstance(fn, str):
-                    value = str(value)
-            
-            else:
-                return value
-
-        return None
+        return self._redis.get(key).decode('utf-8')
+    
