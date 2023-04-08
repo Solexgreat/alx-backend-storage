@@ -13,6 +13,50 @@ def count_calls(methods: callable=None) -> callable:
         return methods(self, data)
     return wrapper
 
+def call_history(method: callable=None) -> callable:
+    """Decorator call history
+    """
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        """wrapper function"""
+        key = method.__qualname__
+        input_key = f"{key}:inputs"
+        output_key = f"{key}:outputs"
+    
+    
+        self._redis.rpush(input_key, str(args))
+        result = method(self, *args, **kwargs)
+        self._redis.rpush(output_key, str(result))
+
+        return str(result)
+    return wrapper
+
+def replay(func: callable):
+    r = redis.Redis()
+    func_name = func.__qualname__
+    number_calls = r.get(func_name)
+
+    try:
+        number_calls = number_calls.decode('utf-8')
+    except Exception:
+        number_calls = 0
+
+    input = r.lrange(f"{func_name}:inputs", 0, -1)
+    output = r.lrange(f"{func_name}:outputs", 0, -1)
+
+    for ins, outs in zip(input, output):
+        try:
+            ins = ins.decode('utf-8')
+        except Exception:
+            ins = ""
+        try:
+            out = ins.decode('utf-8')
+        except Exception:
+            outs = ""
+
+    #Cache.store(*('foo',)) -> 13bf32a9-a249-4664-95fc-b1062db2038f
+    print (f"{func_name }(*({ins})) -> {outs}")
+
 
 class cache:
     """Class that implement cache
@@ -24,6 +68,7 @@ class cache:
         self._redis.flushdb()
    
     @count_calls
+    @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
         """store method takes a single argument, data,
            which can be a string, bytes, int or float,
